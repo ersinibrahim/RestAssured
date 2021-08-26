@@ -1,6 +1,8 @@
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -232,17 +234,22 @@ public class ZippoTest {
         ;
     }
 
-private ResponseSpecification responseSpecification;
+    private ResponseSpecification responseSpecification;
+    private RequestSpecification requestSpecification;
+
     @BeforeClass
-    public void setup()
-    {
-        baseURI="http://api.zippopotam.us";  //RestAssured kendi statik degiskeni tanimli deger ataniyor.
-        responseSpecification=new ResponseSpecBuilder()
+    public void setup() {
+        baseURI = "http://api.zippopotam.us";  //RestAssured kendi statik degiskeni tanimli deger ataniyor.
+        responseSpecification = new ResponseSpecBuilder()
                 .expectStatusCode(200)
                 .expectContentType(ContentType.JSON)
                 .log(LogDetail.BODY)
                 .build();
 
+        requestSpecification = new RequestSpecBuilder()
+                .log(LogDetail.URI)
+                .setAccept(ContentType.JSON)
+                .build();
     }
 
     @Test
@@ -273,4 +280,46 @@ private ResponseSpecification responseSpecification;
         ;
     }
 
+
+    //JSON extract
+
+    @Test
+    public void extractingJsonPath() {
+        String place_name = given()
+                .spec(requestSpecification)
+                .when()
+                .get("/us/90210")
+                .then()
+                .spec(responseSpecification)
+                .extract().path("places[0].'place name'") // extract metodu ile given ile baslayan satir,bir deger
+                // döndürür hale geldi
+
+                ;
+
+
+        System.out.println("place_name = " + place_name);
+
+
+    }
+
+
+    @Test
+    public void extractingJsonPathInt() {
+       int limit = given()
+               .param("page",1)
+               //.log().uri()
+                .when()
+                .get("https://gorest.co.in/public/v1/users")
+                .then()
+               //.log().body()
+                .extract().path("meta.pagination.limit") // extract metodu ile given ile baslayan satir,bir deger
+                // döndürür hale geldi
+
+                ;
+
+
+        System.out.println("limit = " + limit);
+
+
+    }
 }
