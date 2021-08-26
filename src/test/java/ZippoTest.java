@@ -5,49 +5,43 @@ import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
 
-
 public class ZippoTest {
 
     @Test
-    public void test()
-    {
+    public void test() {
 
         given()
                 // hazirlik islemleri
 
-        .when()
+                .when()
                 // link aksiyon islemleri
 
-        .then()
-                //test ve extract islemleri
+                .then()
+        //test ve extract islemleri
 
-;
+        ;
 
     }
 
     @Test
-    public void statusCodeTest()
-    {
+    public void statusCodeTest() {
         given()
 
                 .when()
                 .get("http://api.zippopotam.us/us/90210")
                 .then()
                 .log().body() //.log().all() -> bütün response u gösterir
-        .statusCode(200) // stattus kontrolu
-
+                .statusCode(200) // stattus kontrolu
 
 
         ;
-
 
 
     }
 
 
     @Test
-    public void contentTypeTest()
-    {
+    public void contentTypeTest() {
         given()
                 .when()
                 .get("http://api.zippopotam.us/us/90210")
@@ -55,27 +49,41 @@ public class ZippoTest {
                 .log().body()
                 .contentType(ContentType.JSON)
 
-                ;
+        ;
 
 
     }
 
     @Test
-    public void logTest()
-    {
+    public void logTest() {
         given()
                 .log().all()
                 .when()
                 .get("http://api.zippopotam.us/us/90210")
                 .then()
                 .log().body()
+
         ;
 
 
     }
 
 
+    @Test
+    public void checkStateResponseBody() {
+        given()
 
+
+                .when()
+                .get("http://api.zippopotam.us/us/90210")
+                .then()
+                .log().body()
+                .body("country", equalTo("United States"))
+                .statusCode(200)
+        ;
+
+
+    }
 
 
 }
