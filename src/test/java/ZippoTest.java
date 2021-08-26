@@ -87,14 +87,16 @@ public class ZippoTest {
 
 
     @Test
-    public void bodyJsonPathTest2()
+    public void bodyJsonPathTest2andHasItem()
     {
         given()
                 .when()
                 .get("http://api.zippopotam.us/us/90210")
                 .then()
                 .log().body()
-                .body("places[0].state",equalTo("California"))
+               .body("places[0].state",equalTo("California")) // listin 0 indexli state degerini verir, 1 Deger
+       // .body("places.'state'",hasItem("California")) //Bütün listteki stateleri bir list olarak verir
+        // (bütün statelerde aranan eleman var mi?)
                 ;
 
 
