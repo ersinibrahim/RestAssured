@@ -1,4 +1,8 @@
+import io.restassured.builder.ResponseSpecBuilder;
+import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
+import io.restassured.specification.ResponseSpecification;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static io.restassured.RestAssured.*;
@@ -87,17 +91,16 @@ public class ZippoTest {
 
 
     @Test
-    public void bodyJsonPathTest2andHasItem()
-    {
+    public void bodyJsonPathTest2andHasItem() {
         given()
                 .when()
                 .get("http://api.zippopotam.us/us/90210")
                 .then()
                 .log().body()
-               .body("places[0].state",equalTo("California")) // listin 0 indexli state degerini verir, 1 Deger
-       // .body("places.'state'",hasItem("California")) //Bütün listteki stateleri bir list olarak verir
+                .body("places[0].state", equalTo("California")) // listin 0 indexli state degerini verir, 1 Deger
+        // .body("places.'state'",hasItem("California")) //Bütün listteki stateleri bir list olarak verir
         // (bütün statelerde aranan eleman var mi?)
-                ;
+        ;
 //        places[0].state -> listin 0 indexli elemanının state değerini verir, 1 değer
 //        places.state ->    Bütün listteki state leri bir list olarak verir : California,California2   hasItem
 //        List<String> list= {'California','California2'}
@@ -150,6 +153,7 @@ public class ZippoTest {
                 .statusCode(200)
         ;
     }
+
     @Test
     public void pathParamTest() {
         String country = "us";
@@ -168,7 +172,6 @@ public class ZippoTest {
                 .body("places", hasSize(1))
         ;
     }
-
 
 
     @Test
@@ -192,6 +195,82 @@ public class ZippoTest {
             ;
         }
 
+    }
+
+
+    // https://gorest.co.in/public/v1/users?page=1
+    @Test
+    public void queryParamTest() {
+        given()
+                .param("page", 1)
+                .log().uri()
+
+                .when()
+                .get("https://gorest.co.in/public/v1/users")
+
+                .then()
+                .log().body()
+                .body("meta.pagination.page", equalTo(1));
+        ;
+    }
+
+
+    @Test
+    public void queryParamTestCoklu() {
+        for (int page = 1; page <= 10; page++) {
+            given()
+                    .param("page", page)
+                    .log().uri()
+
+                    .when()
+                    .get("https://gorest.co.in/public/v1/users")
+
+                    .then()
+                    .log().body()
+                    .body("meta.pagination.page", equalTo(page));
+        }
+        ;
+    }
+
+private ResponseSpecification responseSpecification;
+    @BeforeClass
+    public void setup()
+    {
+        baseURI="http://api.zippopotam.us";  //RestAssured kendi statik degiskeni tanimli deger ataniyor.
+        responseSpecification=new ResponseSpecBuilder()
+                .expectStatusCode(200)
+                .expectContentType(ContentType.JSON)
+                .log(LogDetail.BODY)
+                .build();
+
+    }
+
+    @Test
+    public void bodyArrayHasSizeTest_baseUriTest() {
+        given()
+                .log().uri()
+                .when()
+                .get("/us/90210")//buradaki url nin basinda hhtp yoksa baseUri deki deger otomatik geliyor
+
+                .then()
+                .body("places", hasSize(1)) // verilen path deki listin size kontrolü
+                .log().body()
+                .statusCode(200)
+        ;
+    }
+
+
+    @Test
+    public void bodyArrayHasSizeTest_responseSpecification() {
+        given()
+                .log().uri()
+                .when()
+                .get("/us/90210")//buradaki url nin basinda hhtp yoksa baseUri deki deger otomatik geliyor
+
+                .then()
+                .body("places", hasSize(1)) // verilen path deki listin size kontrolü
+                .spec(responseSpecification)
+        ;
     }
 
 }
