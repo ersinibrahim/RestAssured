@@ -1,9 +1,11 @@
+import POJO.Location;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -342,6 +344,49 @@ public class ZippoTest {
 
 
         System.out.println("idS = " + idS);
+
+
+    }
+
+    @Test
+    public void extractingJsonPathStringList() {
+        List<String> districts = given()
+               .spec(requestSpecification)
+                .when()
+                .get("/tr/35030")
+                .then()
+               .spec(responseSpecification)
+                .extract().path("places.'place name'") // extract metodu ile given ile baslayan satir,bir deger
+                // döndürür hale geldi
+
+                ;
+
+
+        System.out.println("dstricts = " + districts);
+        Assert.assertTrue(districts.contains("İnönü Mah."));
+
+
+    }
+
+
+    @Test
+    public void extractingJsonPOJO()
+    {
+        Location location=
+        given()
+
+                .when()
+                .get("/tr/35030")
+
+                .then()
+                .extract().as(Location.class)
+                ;
+
+
+        System.out.println("location = " + location);
+        System.out.println("location.getCountry() = " + location.getCountry());
+        System.out.println("location.getPlaces() = " + location.getPlaces());
+        System.out.println("location.getPlaces().get(6).getPlacename() = " + location.getPlaces().get(6).getPlacename());
 
 
     }
