@@ -7,6 +7,8 @@ import io.restassured.specification.ResponseSpecification;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.util.List;
+
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
@@ -213,7 +215,7 @@ public class ZippoTest {
                 .then()
                 .log().body()
                 .body("meta.pagination.page", equalTo(1));
-        ;
+
     }
 
 
@@ -231,7 +233,7 @@ public class ZippoTest {
                     .log().body()
                     .body("meta.pagination.page", equalTo(page));
         }
-        ;
+
     }
 
     private ResponseSpecification responseSpecification;
@@ -319,6 +321,27 @@ public class ZippoTest {
 
 
         System.out.println("limit = " + limit);
+
+
+    }
+
+
+    @Test
+    public void extractingJsonPathIntList() {
+        List<Integer> idS = given()
+                .param("page",1)
+                //.log().uri()
+                .when()
+                .get("https://gorest.co.in/public/v1/users")
+                .then()
+                //.log().body()
+                .extract().path("data.id") // extract metodu ile given ile baslayan satir,bir deger
+                // döndürür hale geldi
+
+                ;
+
+
+        System.out.println("idS = " + idS);
 
 
     }
