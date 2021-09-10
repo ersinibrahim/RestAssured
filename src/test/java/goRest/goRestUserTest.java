@@ -65,4 +65,92 @@ public class goRestUserTest {
         return randomString + "@gmail.com";
     }
 
+
+    @Test(dependsOnMethods = "createUser",priority = 1)
+    public void getUserByID() {
+
+        given()
+                .pathParam("userID", userID)
+                .log().uri()
+
+
+                .when()
+                .get("https://gorest.co.in/public/v1/users/{userID}")
+
+
+                .then()
+                .statusCode(200)
+                .body("data.id", equalTo(userID))
+
+        ;
+
+
+    }
+
+    @Test(dependsOnMethods = "createUser",priority = 2)
+    public void updateUserById() {
+        String name = "ersin ibrahim oral";
+        given()
+                .header("Authorization", "Bearer 36e95c8fd3e7eb89a65bad6edf4c0a62ddb758f9ed1e15bb98421fb0f1f3e57f")
+                .contentType(ContentType.JSON)
+                .body("{\"name\":\"" + name + "\"}")
+                .pathParam("userID", userID)
+                //.log().uri()
+
+
+                .when()
+                .put("https://gorest.co.in/public/v1/users/{userID}")
+
+
+                .then()
+                // .log().body()
+                .statusCode(200)
+                .body("data.name", equalTo(name))
+        ;
+
+
+    }
+
+    @Test(dependsOnMethods = "createUser",priority = 3)
+    public void deleteUserById() {
+        given()
+                .header("Authorization", "Bearer 36e95c8fd3e7eb89a65bad6edf4c0a62ddb758f9ed1e15bb98421fb0f1f3e57f")
+                .pathParam("userID", userID)
+                .log().uri()
+                .when()
+                .delete("https://gorest.co.in/public/v1/users/{userID}")
+                // pathParam :  https://gorest.co.in/public/v1/users/1802
+                // param  :    https://gorest.co.in/public/v1/users/%7BuserID%7D?userID=1803
+
+                .then()
+                .statusCode(204)
+                .log().body()
+
+
+        ;
+
+
+    }
+
+
+    @Test(dependsOnMethods = "deleteUserById")
+    public void deleteUserByIdNegative() {
+        given()
+                .header("Authorization", "Bearer 36e95c8fd3e7eb89a65bad6edf4c0a62ddb758f9ed1e15bb98421fb0f1f3e57f")
+                .pathParam("userID", userID)
+
+                .when()
+                .delete("https://gorest.co.in/public/v1/users/{userID}")
+
+
+                .then()
+                .log().body()
+                .statusCode(404)
+
+
+
+        ;
+
+
+    }
 }
